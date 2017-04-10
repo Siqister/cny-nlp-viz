@@ -24,6 +24,7 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "d3": "^4.4.0",
+    "in-view": "^0.6.1",
     "jquery": "^3.2.1"
   }
 }
