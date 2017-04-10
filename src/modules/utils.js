@@ -19,7 +19,11 @@ function mapEntitiesToArray(docs){
 		})
 		.reduce((results,entities)=>{
 			return results.concat(entities);
-		},[]);
+		},[])
+		.map((doc)=>{
+			doc.name = doc.name.toUpperCase();
+			return doc;
+		});
 }
 
 export {loadJson, mapEntitiesToArray};
