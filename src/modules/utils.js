@@ -1,5 +1,16 @@
 import {json} from 'd3';
 
+const config = {
+	colors:[
+		'rgb(0,166,100)',
+		'rgb(241,90,34)',
+		'rgb(0,0,255)',
+		'rgb(255,194,14)'
+	]
+}
+
+const scaleColor = d3.scaleOrdinal().range(config.colors);
+
 function loadJson(url){
 	return new Promise((resolve,reject)=>{
 		json(url,(err,data)=>{
@@ -26,4 +37,4 @@ function mapEntitiesToArray(docs){
 		});
 }
 
-export {loadJson, mapEntitiesToArray};
+export {scaleColor, loadJson, mapEntitiesToArray};

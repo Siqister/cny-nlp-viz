@@ -30,10 +30,11 @@ function Entities(dom){
 	_graphic
 		.attr('transform',`translate(${_m.l},${_m.t})`);
 
-		
-	function exports(entities){
-		//@param {array} entities Array of non-unique entities
+/*	@param {array} entities - Array of non-unique entities
+*/	function exports(entities){
 		let nodes = _reduce(entities).slice(0,_nx*_ny);
+
+		console.log(_links(entities));
 
 		//Layout location of each node
 		//And instantiate a new TextNode for each
@@ -59,7 +60,8 @@ function Entities(dom){
 			});
 	}
 
-	function _reduce(entities){
+/*	@param {Array} entities - non-unique array of entity mentions
+*/	function _reduce(entities){
 		//Return array of unique entities
 		return d3.nest()
 			.key(d=>d.name)
@@ -73,6 +75,12 @@ function Entities(dom){
 			})
 			.entries(entities)
 			.sort((a,b)=>{return b.value.max_salience - a.value.max_salience});
+	}
+
+/*	@param {Array} entities - non-unique array of entity mentions*/
+	function _links(entities){
+
+		return entities;
 	}
 
 	return exports;
