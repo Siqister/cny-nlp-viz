@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 
+import {scaleColor} from './utils';
+
 function TextNode(){
 	const _m = {t:20,r:20,b:40,l:20};
 	const _histogram = d3.histogram()
@@ -19,7 +21,7 @@ function TextNode(){
 
 		//Build DOM
 		//FIXME: not conformant with enter exit update
-		d3.select(this)
+		let histogramBackground = d3.select(this)
 			.append('g')
 			.attr('transform',`translate(${_m.l},${_m.t})`)
 			.attr('class','histogram-back')
@@ -31,35 +33,59 @@ function TextNode(){
 			.attr('y',0)
 			.attr('width',d=>_w/10-2)
 			.attr('height',_h)
-			.style('fill','rgb(252,252,252)');
+			.style('fill','white');
 
 
-		d3.select(this)
+		let histogram = d3.select(this)
 			.append('g')
 			.attr('transform',`translate(${_m.l},${_m.t})`)
 			.attr('class','histogram')
 			.call(_drawHistogram,d);
 
-		d3.select(this)
+		let text = d3.select(this)
 			.append('text')
 			.attr('transform',`translate(${d.w/2},${d.h-15})`)
 			.attr('text-anchor','middle')
-			.text(d.key);
+			.text(d.key)
+			.style('font-size','12px');
+
+		let textUnderline = d3.select(this)
+			.append('line')
+			.attr('transform',`translate(${d.w/2},${d.h-7})`)
+			.attr('x1',-text.node().getComputedTextLength()/2)
+			.attr('x2',text.node().getComputedTextLength()/2)
+			.style('stroke-width','2px')
+			.style('stroke',scaleColor(d.value.instances[0].type)); //FIXME: using baked-in type to color
+
+		let counter = d3.select(this)
+			.append('g')
+			.attr('class','counter')
+			.attr('transform',`translate(${_m.l+_w},${_m.t})`);
+		counter.append('circle')
+			.attr('r',8)
+			.style('fill',scaleColor(d.value.instances[0].type));
+		counter.append('text')
+			.attr('text-anchor','middle')
+			.attr('dy',4)
+			.text(d.value.count)
+			.style('fill','white')
+			.style('font-size','12px');
 	}
 
 /*	@param {selection} n - selection of <g.histogram>
 	@param {Object} d - datum bound to this TextNode instance*/
 	function _drawHistogram(n,datum){
-		//FIXME: something screwy with enter exit update pattern
-		n
+		let bins = n
 			.selectAll('.bin')
-			.data(_histogram(datum.value.instances))
-			.enter()
+			.data(_histogram(datum.value.instances));
+		let binsEnter = bins.enter()
 			.append('rect').attr('class','bin')
 			.attr('x',(d,i)=>i*_w/10)
 			.attr('width',d=>_w/10-2)
 			.attr('y',_h)
 			.attr('height',0)
+			.style('fill','rgb(80,80,80)')
+		binsEnter.merge(bins)
 			.transition()
 			.attr('y',d=>scaleY(d.length))
 			.attr('height',d=>(_h - scaleY(d.length)));

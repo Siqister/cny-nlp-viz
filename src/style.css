@@ -6,6 +6,7 @@ html,body{
 	margin:0;
 	padding:0;
 }
+body{ background:rgb(253,253,253); }
 
 .viz-container{
 	position:relative;
@@ -17,30 +18,63 @@ html,body{
 	/*background:rgb(255,255,250);*/
 }
 .full-screen-right{
-	height:100%;
-	width:75%;
-	margin-left:25%;
-}
-	.graph{
-		width:100%;
-		height:100%;
-	}
-.full-screen-left{
 	width:25%;
+	margin-left:75%;
 }
+.full-screen-left{
+	width:75%;
+	height:100%;
+}
+	#sentiment-graph-container{
+		width:100%;
+		height:25%;
+	}
+	#entities-graph-container{
+		width:100%;
+		height:75%;
+	}
+		#sentiment-graph,
+		#entities-graph{
+			width:100%;
+			height:100%;
+
+		}
+
 
 /* Override Bootstrap */
-.panel-heading{
-	background:white !important;
-}
 
 #comments{
 	border-left:1px solid #ddd;
 	border-right:1px solid #ddd;
 	color:#666;
+	background:white;
 }
 	#comments .comment{
 		margin:10px 0;
 		padding:10px 0;
 		border-bottom:1px solid #ddd;
 	}
+		.comment .panel-title{font-family:'MaisonNeueBold', sans-serif;}
+		.comment .panel-body{font-family:'PublicoRoman', sans-serif;}
+
+#entities-graph{}
+	#entities-graph .node text{font-family:'PublicoRoman', sans-serif;}
+
+
+/* Fonts */
+@font-face{
+	font-family: PublicoBold;
+	src:url('./fonts/PublicoText-Bold.otf');
+}
+@font-face{
+	font-family: PublicoRoman;
+	src:url('./fonts/PublicoText-Roman.otf');
+}
+@font-face{
+	font-family: MaisonNeueBold;
+	src:url('./fonts/MaisonNeueTRIAL-Bold.otf');
+}
+@font-face{
+	font-family: MaisonNeueBook;
+	src:url('./fonts/MaisonNeueTRIAL-Book.otf');
+}
