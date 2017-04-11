@@ -47,4 +47,10 @@ function mapEntitiesToArray(docs){
 		},[]);
 }
 
-export {scaleColor, loadJson, mapEntitiesToArray, config};
+function partialCall(dis,...presetArgs){
+	return (...laterArgs)=>{
+		return dis.call.call(dis, ...presetArgs, ...laterArgs);
+	}
+}
+
+export {config, scaleColor, loadJson, mapEntitiesToArray, partialCall};

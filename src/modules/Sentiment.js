@@ -6,13 +6,15 @@ function Sentiment(dom){
 
 	const _svg = d3.select(dom).select('svg').size()===0?d3.select(dom).append('svg'):d3.select(dom).select('svg');
 	const _graphic = _svg.select('.graphic').size()===0?_svg.append('g').attr('class','graphic'):_svg.select('.graphic');
-	const _m = {t:30, r:50, l:70, b:30};
+	const _m = {t:50, r:50, l:70, b:20};
 	const _w = Math.floor((dom.clientWidth - _m.l - _m.r)/config.textNodeMinSizeX)*config.textNodeMinSizeX-40,
 		_h = dom.clientHeight - _m.t - _m.b,
 		_r = 6;
 
 	const _scaleX = d3.scaleLinear().domain([-1,1]).range([0,_w]), //score
-		_scaleY = d3.scaleLinear().domain([0,5]).range([_h,0]); //magnitude
+		_scaleY = d3.scaleLinear().domain([0,5]).range([_h,0]), //magnitude
+		_scaleOpacity = d3.scaleLinear().domain([0,5]).range([.1,1]),
+		_scaleColor = d3.scaleLinear().domain([-1,0,1]).range(['red','purple','blue']);
 
 	_svg
 		.attr('width',dom.clientWidth)
@@ -22,30 +24,49 @@ function Sentiment(dom){
 	_graphic
 		.attr('transform',`translate(${_m.l},${_m.t})`);
 
-	function exports(docs){
+	//Internal dispatch
+	const _dis = d3.dispatch(
+		'sentiment:hover',
+		'sentiment:unhover',
+		'highlight',
+		'unhighlight');
 
-		let background = _graphic.selectAll('.background')
-			.data([1])
-			.enter()
-			.append('g').attr('class','background');
-		background.append('rect')
-			.style('fill','white')
-			.attr('width',_w)
-			.attr('height',_h);
-		background.append('line')
-			.attr('x1',_w/2)
-			.attr('x2',_w/2)
-			.attr('y1',0)
-			.attr('y2',_h)
-			.style('stroke','#ccc')
-			.style('stroke-width','1px');
-/*		background.append('line')
-			.attr('x1',0)
-			.attr('x2',_w)
-			.attr('y1',_h)
-			.attr('y2',_h)
-			.style('stroke','#ccc')
-			.style('stroke-width','1px');*/
+	//Append static elements
+	let background = _graphic.selectAll('.background')
+		.data([1])
+		.enter()
+		.append('g').attr('class','background');
+/*		background.append('rect')
+		.style('fill','white')
+		.attr('width',_w)
+		.attr('height',_h);
+*/	let ticks = background.selectAll('.tick')
+		.data(d3.range(-1,1.001,.2))
+		.enter()
+		.append('line').attr('class','tick')
+		.attr('x1',d=>_scaleX(d))
+		.attr('x2',d=>_scaleX(d))
+		.attr('y1',0)
+		.attr('y2',_h)
+		.style('stroke-width','1px')
+		.style('stroke',d=>_scaleColor(d));
+	ticks.filter(d=>(d!==0))
+		.style('stroke-dasharray','3px 3px')
+		.filter(d=>(d===-1 || d===1))
+		.attr('y1',20);
+	background.selectAll('.sentiment-anchor-text')
+		.data([['More negative',-1], ['More positive',1]])
+		.enter()
+		.append('text')
+		.attr('class','sentiment-anchor-text anno')
+		.attr('text-anchor','middle')
+		.attr('x',(d)=>_scaleX(d[1]))
+		.style('fill',d=>_scaleColor(d[1]))
+		.attr('dy',10)
+		.text(d=>d[0]);
+
+
+	function exports(docs){
 
 		let node = _graphic.selectAll('.comment')
 			.data(docs.filter(doc=>doc),d=>d.id);
@@ -53,21 +74,68 @@ function Sentiment(dom){
 			.append('g').attr('class','comment')
 			.attr('transform',d=>`translate(${_scaleX(d.sentiment.score)},${_scaleY(d.sentiment.magnitude)})`);
 		nodeEnter.append('circle')
+			.attr('class','target')
+			.attr('r',_r*3)
+			.style('fill-opacity',0);
+		nodeEnter.append('circle')
 			.attr('class','outer')
 			.attr('r',0)
-			.style('fill-opacity',.1)
-			.style('fill','#03afeb')
-			.style('stroke','#03afeb')
-			.style('stroke-opacity',.5)
+			.style('fill-opacity',d=>_scaleOpacity(d.sentiment.magnitude)/3)
+			.style('stroke-opacity',d=>_scaleOpacity(d.sentiment.magnitude))
+			.style('fill',d=>_scaleColor(d.sentiment.score))
+			.style('stroke',d=>_scaleColor(d.sentiment.score))
 			.style('stroke-width','2px');
 		nodeEnter.append('circle')
 			.attr('r',2)
-			.style('fill-opacity',.5)
-			.style('fill','#03afeb');
+			.style('fill-opacity',d=>_scaleOpacity(d.sentiment.magnitude))
+			.style('fill',d=>_scaleColor(d.sentiment.score));
 		nodeEnter.merge(node)
+			.transition()
+			.delay((d,i)=>i*50)
 			.selectAll('.outer')
-			.transition().duration(1000)
-			.attr('r',_r)
+			.attr('r',_r);
+
+		//Emit events
+		nodeEnter
+			.on('mouseenter',function(d){
+				_dis.call('sentiment:hover',null,d.id);
+				d3.select(this).select('.target')
+					.style('fill-opacity',.05);
+			})
+			.on('mouseleave',function(d){
+				_dis.call('sentiment:unhover',null,d.id);
+				d3.select(this).select('.target')
+					.style('fill-opacity',0);
+			});
+
+		//Highlight
+		_dis.on('highlight',(id)=>{
+			let target = nodeEnter.merge(node)
+				.filter(d=>(d.id===id));
+			target
+				.select('.target')
+				.style('fill-opacity',.2);
+		});
+		_dis.on('unhighlight',(id)=>{
+			nodeEnter.merge(node)
+				.select('.target')
+				.style('fill-opacity',0);	
+		});
+	}
+
+	exports.on = function(){
+		_dis.on.apply(_dis,arguments);
+		return this;
+	}
+
+	exports.highlight = function(id){
+		_dis.call('highlight',null,id)
+		return this;
+	};
+
+	exports.unhighlight = function(){
+		_dis.call('unhighlight');
+		return this;
 	}
 
 	return exports;
