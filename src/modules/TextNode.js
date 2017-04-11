@@ -11,7 +11,7 @@ function TextNode(){
 	const scaleY = d3.scaleLinear().domain([0,10]);
 	let _w, _h;
 
-	function exports(d){
+	function exports(d,i){
 		//@param {Object} d Datum bound to each text node
 		//@param {Element} this Element <g.node>
 		
@@ -40,14 +40,19 @@ function TextNode(){
 			.append('g')
 			.attr('transform',`translate(${_m.l},${_m.t})`)
 			.attr('class','histogram')
-			.call(_drawHistogram,d);
+			.call(_drawHistogram,d,i);
 
 		let text = d3.select(this)
 			.append('text')
 			.attr('transform',`translate(${d.w/2},${d.h-15})`)
 			.attr('text-anchor','middle')
 			.text(d.key)
-			.style('font-size','12px');
+			.style('font-size','12px')
+			.style('opacity',0);
+		text
+			.transition()
+			.delay(i*100)
+			.style('opacity',1);
 
 		let textUnderline = d3.select(this)
 			.append('line')
@@ -74,7 +79,7 @@ function TextNode(){
 
 /*	@param {selection} n - selection of <g.histogram>
 	@param {Object} d - datum bound to this TextNode instance*/
-	function _drawHistogram(n,datum){
+	function _drawHistogram(n,datum,index){
 		let bins = n
 			.selectAll('.bin')
 			.data(_histogram(datum.value.instances));
@@ -87,6 +92,7 @@ function TextNode(){
 			.style('fill','rgb(80,80,80)')
 		binsEnter.merge(bins)
 			.transition()
+			.delay(index*100)
 			.attr('y',d=>scaleY(d.length))
 			.attr('height',d=>(_h - scaleY(d.length)));
 	}
