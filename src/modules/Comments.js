@@ -59,13 +59,15 @@ function Comments(dom){
 
 		_dis.on('highlight:entity',(d)=>{
 			let targeted = merge.selectAll('.entity')
-				/*.filter(en=>en.name===d.key)
-				.style('background',en=>scaleColor(en.type));*/
-			console.log(targeted.nodes());
+				.filter(en=>en.name===d.key)
+				.style('background',en=>scaleColor(en.type))
+				.style('color','white');
 		});
 
 		_dis.on('unhighlight:entity',()=>{
-			console.log('Unhighlight:entity');
+			merge.selectAll('.entity')
+				.style('background',null)
+				.style('color',null);
 		});
 	}
 
@@ -141,7 +143,7 @@ function insertEntities(doc){
 
 	mentions.forEach(mention=>{
 		innerHtml.push(...(charArray.slice(prevIndex,mention.beginOffset)));
-		innerHtml.push(`<span class="entity" data-name=${mention.name} data-type=${mention.type}>`);
+		innerHtml.push(`<span class="entity" data-name="${mention.name}" data-type="${mention.type}">`);
 		innerHtml.push(...(charArray.slice(mention.beginOffset,mention.beginOffset+mention.length)));
 		innerHtml.push('</span>');
 		prevIndex = mention.beginOffset + mention.length;
