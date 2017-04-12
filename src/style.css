@@ -86,6 +86,7 @@ body{ background:rgb(253,253,253); }
 	}
 	#entities-graph .node .target{fill-opacity:0;}
 	#entities-graph .node:hover .target{fill-opacity:.05;}
+	#entities-graph .node.selected .target{fill-opacity:.1;}
 	#entities-graph .node .underline{stroke-width:2px;}
 	#entities-graph .node:hover .underline{stroke-width:4px;}
 

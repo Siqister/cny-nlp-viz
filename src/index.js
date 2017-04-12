@@ -21,7 +21,9 @@ const dispatch = d3.dispatch(
 	'sentiment:hover',
 	'sentiment:unhover',
 	'sentiment:select',
-	'sentiment:deselect'
+	'sentiment:deselect',
+	'entities:select',
+	'entities:deselect'
 );
 
 //Build modules on data load
@@ -45,6 +47,9 @@ sentimentGraph
 	.on('sentiment:unhover', partialCall(dispatch,'sentiment:unhover',null))
 	.on('sentiment:select',partialCall(dispatch,'sentiment:select',null))
 	.on('sentiment:deselect',partialCall(dispatch,'sentiment:deselect',null));
+entitiesGraph
+	.on('entities:selectEntity',partialCall(dispatch,'entities:select',null))
+	.on('entities:deselect',partialCall(dispatch,'entities:deselect',null));
 
 //...Receiving
 dispatch.on('comment:hover', sentimentGraph.highlight);
@@ -62,5 +67,6 @@ dispatch.on('sentiment:deselect',()=>{
 	data
 		.then(legend);
 });
-
+dispatch.on('entities:select', comments.highlightEntity)
+dispatch.on('entities:deselect', comments.unhighlightEntity);
 

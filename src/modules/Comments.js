@@ -1,12 +1,16 @@
 import * as d3 from 'd3';
 
+import {scaleColor} from './utils';
+
 function Comments(dom){
 
 	const _dis = d3.dispatch(
 		'comment:hover',
 		'comment:unhover',
 		'highlight',
-		'unhighlight');
+		'unhighlight',
+		'highlight:entity',
+		'unhighlight:entity');
 
 	function exports(docs){
 		let update = d3.select(dom)
@@ -52,6 +56,17 @@ function Comments(dom){
 		_dis.on('unhighlight',()=>{
 			merge.classed('comment-highlight',false);
 		});
+
+		_dis.on('highlight:entity',(d)=>{
+			let targeted = merge.selectAll('.entity')
+				/*.filter(en=>en.name===d.key)
+				.style('background',en=>scaleColor(en.type));*/
+			console.log(targeted.nodes());
+		});
+
+		_dis.on('unhighlight:entity',()=>{
+			console.log('Unhighlight:entity');
+		});
 	}
 
 	exports.on = function(){
@@ -69,6 +84,16 @@ function Comments(dom){
 		return this;
 	}
 
+	exports.highlightEntity = function(d){
+		_dis.call('highlight:entity',null,d);
+		return this;
+	}
+
+	exports.unhighlightEntity = function(){
+		_dis.call('unhighlight:entity');
+		return this;
+	}
+
 	function _scrollTo(el){
 		//FIXME: not robust
 		window.scrollTo(0, el.offsetTop);
@@ -81,6 +106,7 @@ function Comments(dom){
 function insertEntities(doc){
 	const body = doc.body;
 	const entities = doc.entities;
+
 	//entities
 	//--entity {Object}
 	//----entity.name {String}
@@ -94,6 +120,7 @@ function insertEntities(doc){
 
 	let mentions = entities.slice()
 		.map(entity=>{
+
 			return entity.mentions.map(mention=>{
 				return {
 					'name':entity.name,
@@ -103,7 +130,8 @@ function insertEntities(doc){
 				}
 			});
 		})
-		.reduce((result,mentions)=>result.concat(mentions),[]);
+		.reduce((result,mentions)=>result.concat(mentions),[])
+		.sort((a,b)=>a.beginOffset-b.beginOffset);
 
 	//FIXME: ugh this is ugly
 	//FIXME: Returned parsed HTML string is incorrect
@@ -128,6 +156,15 @@ function insertEntities(doc){
 @param {Object} d - doc data*/
 function parseEntityNodes(d){
 	d3.select(this).selectAll('.entity')
+		.each(function(){
+			/*@param {Element} this - <span.entity> element*/
+			let name = this.dataset.name,
+				type = this.dataset.type;
+			d3.select(this).datum({
+				name,
+				type
+			});
+		});
 }
 
 export default Comments;

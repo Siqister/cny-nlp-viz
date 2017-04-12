@@ -24,6 +24,11 @@ function Entities(dom){
 	const _nx = Math.floor(_w/MIN_SIZE_X), //number of nodes along x axis
 		_ny = Math.floor(_h/MIN_SIZE_Y); //number of nodes along y axis
 
+	const _dis = d3.dispatch(
+		'entities:selectEntity',
+		'entities:deselect'
+	);
+
 	_canvas
 		.attr('width',dom.clientWidth)
 		.attr('height',dom.clientHeight);
@@ -50,6 +55,23 @@ function Entities(dom){
 		nsEnter.merge(ns)
 			.call(_position)
 			.each(TextNode());
+
+		//Events
+		nsEnter
+			.on('click',function(d){
+				if(d3.select(this).classed('selected')){
+					d3.select(this).classed('selected',false);
+					_dis.call('entities:deselect');
+				}else{
+					d3.select(this).classed('selected',true);
+					_dis.call('entities:selectEntity',null,d);
+				}
+			});
+	}
+
+	exports.on = function(){
+		_dis.on.apply(_dis,arguments);
+		return this;
 	}
 
 	function _position(ns){
