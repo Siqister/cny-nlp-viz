@@ -106,6 +106,9 @@ function TextNode(){
 		counter.merge(counterEnter)
 			.select('text')
 			.text(d.value.count);
+		counter.merge(counterEnter)
+			.select('circle')
+			.style('fill',scaleColor(d.value.instances[0].type));
 	}
 
 /*	@param {selection} n - selection of <g.histogram>

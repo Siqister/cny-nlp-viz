@@ -16,7 +16,7 @@ function Entities(dom){
 	const _canvas = d3.select(dom).select('canvas').size()===0?d3.select(dom).append('canvas'):d3.select(dom).select('canvas');
 	const _svg = d3.select(dom).select('svg').size()===0?d3.select(dom).append('svg'):d3.select(dom).select('svg');
 	const _graphic = _svg.select('.graphic').size()===0?_svg.append('g').attr('class','graphic'):_svg.select('.graphic');
-	const _m = {t:40, r:50, l:50, b:20};
+	const _m = {t:60, r:50, l:50, b:20};
 	const _w = dom.clientWidth - _m.l - _m.r,
 		_h = dom.clientHeight - _m.t - _m.b;
 	const MIN_SIZE_X = config.textNodeMinSizeX,
@@ -54,7 +54,6 @@ function Entities(dom){
 
 	function _position(ns){
 		ns
-			.transition().duration(1000)
 			.attr('transform',(d,i)=>{
 				let currentX = i%_nx,
 					currentY = Math.floor(i/_nx);
