@@ -66,9 +66,10 @@ body{ background:rgb(253,253,253); }
 		}
 		.comment .panel-title{font-family:'MaisonNeueBold', sans-serif;}
 		.comment .panel-body{font-family:'PublicoRoman', sans-serif;}
+		
 			.comment .panel-body .entity{
 				background:rgb(245,245,245);
-				text-decoration:underline;
+				font-family:'MaisonNeueBold', sans-serif;
 			}
 
 #entities-graph{}

@@ -106,6 +106,7 @@ function insertEntities(doc){
 		.reduce((result,mentions)=>result.concat(mentions),[]);
 
 	//FIXME: ugh this is ugly
+	//FIXME: Returned parsed HTML string is incorrect
 	let charArray = body.split(''),
 		innerHtml = [],
 		prevIndex = 0;
