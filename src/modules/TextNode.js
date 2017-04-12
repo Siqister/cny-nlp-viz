@@ -60,37 +60,52 @@ function TextNode(){
 			.call(_drawHistogram,d,i);
 
 		let text = d3.select(this)
-			.append('text')
+			.selectAll('.word')
+			.data([1]);
+		let textEnter = text
+			.enter()
+			.append('text').attr('class','word')
 			.attr('transform',`translate(${d.w/2},${d.h-15})`)
 			.attr('text-anchor','middle')
-			.text(d.key)
 			.style('font-size','12px')
 			.style('opacity',0);
-		text
+		let textMerge = text.merge(textEnter)
+			.text(d.key);
+		textMerge
 			.transition()
 			.delay(i*100)
 			.style('opacity',1);
 
 		let textUnderline = d3.select(this)
+			.selectAll('.underline')
+			.data([1]);
+		let textUnderlineEnter = textUnderline
+			.enter()
 			.append('line').attr('class','underline')
-			.attr('transform',`translate(${d.w/2},${d.h-7})`)
-			.attr('x1',-text.node().getComputedTextLength()/2)
-			.attr('x2',text.node().getComputedTextLength()/2)
+			.attr('transform',`translate(${d.w/2},${d.h-7})`);
+		textUnderline.merge(textUnderlineEnter)
+			.attr('x1',-textMerge.node().getComputedTextLength()/2)
+			.attr('x2',textMerge.node().getComputedTextLength()/2)
 			.style('stroke',scaleColor(d.value.instances[0].type)); //FIXME: using baked-in type to color
 
 		let counter = d3.select(this)
+			.selectAll('.counter')
+			.data([1]);
+		let counterEnter = counter.enter()
 			.append('g')
 			.attr('class','counter')
 			.attr('transform',`translate(${_m.l+_w},${_m.t})`);
-		counter.append('circle')
+		counterEnter.append('circle')
 			.attr('r',8)
 			.style('fill',scaleColor(d.value.instances[0].type));
-		counter.append('text')
+		counterEnter.append('text')
 			.attr('text-anchor','middle')
 			.attr('dy',4)
-			.text(d.value.count)
 			.style('fill','white')
 			.style('font-size','12px');
+		counter.merge(counterEnter)
+			.select('text')
+			.text(d.value.count);
 	}
 
 /*	@param {selection} n - selection of <g.histogram>
