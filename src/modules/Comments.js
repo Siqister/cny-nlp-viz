@@ -26,7 +26,7 @@ function Comments(dom){
 			.each(parseEntityNodes);
 		merge
 			.transition()
-			.delay((d,i)=>i*200)
+			.delay((d,i)=>i*100)
 			.style('opacity',1);
 
 		//Event emitting
@@ -118,6 +118,7 @@ function insertEntities(doc){
 		innerHtml.push('</span>');
 		prevIndex = mention.beginOffset + mention.length;
 	});
+	innerHtml.push(...(charArray.slice(prevIndex)));
 	innerHtml = innerHtml.join('');
 
 	return innerHtml;

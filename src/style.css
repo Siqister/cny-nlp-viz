@@ -66,14 +66,21 @@ body{ background:rgb(253,253,253); }
 		}
 		.comment .panel-title{font-family:'MaisonNeueBold', sans-serif;}
 		.comment .panel-body{font-family:'PublicoRoman', sans-serif;}
-		
+
 			.comment .panel-body .entity{
 				background:rgb(245,245,245);
 				font-family:'MaisonNeueBold', sans-serif;
 			}
 
+/*#entities-graph*/
 #entities-graph{}
-	#entities-graph .node text{font-family:'PublicoRoman', sans-serif;}
+	#entities-graph .node text{
+		font-family:'PublicoRoman', sans-serif;
+	}
+	#entities-graph .node .target{fill-opacity:0;}
+	#entities-graph .node:hover .target{fill-opacity:.05;}
+	#entities-graph .node .underline{stroke-width:2px;}
+	#entities-graph .node:hover .underline{stroke-width:4px;}
 
 .anno{font-family:'MaisonNeueBold', sans-serif;}
 

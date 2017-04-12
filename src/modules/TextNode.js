@@ -21,6 +21,12 @@ function TextNode(){
 
 		//Build DOM
 		//FIXME: not conformant with enter exit update
+		let target = d3.select(this)
+			.append('rect')
+			.attr('width',d.w)
+			.attr('height',d.h)
+			.attr('class','target');
+
 		let histogramBackground = d3.select(this)
 			.append('g')
 			.attr('transform',`translate(${_m.l},${_m.t})`)
@@ -55,11 +61,10 @@ function TextNode(){
 			.style('opacity',1);
 
 		let textUnderline = d3.select(this)
-			.append('line')
+			.append('line').attr('class','underline')
 			.attr('transform',`translate(${d.w/2},${d.h-7})`)
 			.attr('x1',-text.node().getComputedTextLength()/2)
 			.attr('x2',text.node().getComputedTextLength()/2)
-			.style('stroke-width','2px')
 			.style('stroke',scaleColor(d.value.instances[0].type)); //FIXME: using baked-in type to color
 
 		let counter = d3.select(this)
