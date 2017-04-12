@@ -29,7 +29,12 @@ function Sentiment(dom){
 		'sentiment:hover',
 		'sentiment:unhover',
 		'highlight',
-		'unhighlight');
+		'unhighlight',
+		'brushstart',
+		'brush',
+		'brushend',
+		'sentiment:select',
+		'sentiment:deselect');
 
 	//Append static elements
 	let background = _graphic.selectAll('.background')
@@ -65,6 +70,19 @@ function Sentiment(dom){
 		.attr('dy',10)
 		.text(d=>d[0]);
 
+	//Append brush
+	const brush = d3.brush()
+		.extent([[0,0],[_w,_h]])
+		.on('start',_onBrushStart)
+		.on('brush',_onBrush)
+		.on('end',_onBrushEnd);
+	let _brush = _graphic.selectAll('.brush')	
+		.data([1])
+		.enter()
+		.append('g')
+		.attr('class','brush')
+		.call(brush);
+
 
 	function exports(docs){
 
@@ -86,6 +104,7 @@ function Sentiment(dom){
 			.style('stroke',d=>_scaleColor(d.sentiment.score))
 			.style('stroke-width','2px');
 		nodeEnter.append('circle')
+			.attr('class','inner')
 			.attr('r',2)
 			.style('fill-opacity',d=>_scaleOpacity(d.sentiment.magnitude))
 			.style('fill',d=>_scaleColor(d.sentiment.score));
@@ -121,6 +140,52 @@ function Sentiment(dom){
 				.select('.target')
 				.style('fill-opacity',0);	
 		});
+
+		//Brush event handling
+		_dis.on('brushstart',()=>{
+			//On brush start, clear all highlights
+/*			let merge = node.merge(nodeEnter);
+			merge.select('.inner').attr('r',2);
+			merge.select('.outer').attr('r',_r);
+*/		});
+		_dis.on('brush',extent=>{
+			//On brush, highlight doc nodes
+			let merge = node.merge(nodeEnter);
+			merge.select('.inner').attr('r',2);
+			merge.select('.outer').attr('r',_r);
+			let selected = merge
+				.filter(_filterFromExtent(extent));
+			selected.select('.inner').attr('r',3);
+			selected.select('.outer').attr('r',_r*1.5);
+		});
+		_dis.on('brushend',extent=>{
+			//On brush end, either dispatch 'sentiment:select' or 'sentiment:deselect'
+			if(!extent){
+				//if brush is empty
+				let merge = node.merge(nodeEnter);
+				merge.select('.inner').attr('r',2);
+				merge.select('.outer').attr('r',_r);
+				_dis.call('sentiment:deselect');
+			}else{
+				let merge = node.merge(nodeEnter);
+				let selected = merge
+					.filter(_filterFromExtent(extent));
+				//extract data array from selected
+				let selectedDocs = selected.nodes().map((n)=>{
+					return d3.select(n).datum();
+				});
+				_dis.call('sentiment:select', null, selectedDocs);
+			}
+		});
+		function _filterFromExtent(ext){
+			return function(d){
+				let x0 = ext[0][0], x1 = ext[1][0],
+					y0 = ext[0][1], y1 = ext[1][1],
+					x = _scaleX(d.sentiment.score),
+					y = _scaleY(d.sentiment.magnitude);
+				return x >= x0 && x <= x1 && y >= y0 && y <= y1;
+			}
+		}
 	}
 
 	exports.on = function(){
@@ -136,6 +201,18 @@ function Sentiment(dom){
 	exports.unhighlight = function(){
 		_dis.call('unhighlight');
 		return this;
+	}
+
+	function _onBrushStart(){
+		_dis.call('brushstart',null,d3.event.selection);
+	}
+
+	function _onBrush(){
+		_dis.call('brush',null,d3.event.selection);
+	}
+
+	function _onBrushEnd(){
+		_dis.call('brushend',null,d3.event.selection);
 	}
 
 	return exports;

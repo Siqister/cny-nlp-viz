@@ -36,7 +36,9 @@ comments
 	.on('comment:unhover', partialCall(dispatch,'comment:unhover',null));
 sentimentGraph
 	.on('sentiment:hover', partialCall(dispatch,'sentiment:hover',null))
-	.on('sentiment:unhover', partialCall(dispatch,'sentiment:unhover',null));
+	.on('sentiment:unhover', partialCall(dispatch,'sentiment:unhover',null))
+	.on('sentiment:select',(docs)=>{ console.log(docs)})
+	.on('sentiment:deselect',()=>{console.log('Sentiment:deselect')});
 
 //...Receiving
 dispatch.on('comment:hover', sentimentGraph.highlight);
