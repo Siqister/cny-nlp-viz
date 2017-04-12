@@ -84,6 +84,10 @@ body{ background:rgb(253,253,253); }
 
 .anno{font-family:'MaisonNeueBold', sans-serif;}
 
+/*#sentiment-graph*/
+#sentiment-graph{}
+	#sentiment-graph .brush .selection{stroke:none; fill-opacity:.15;}
+
 
 /* Fonts */
 @font-face{

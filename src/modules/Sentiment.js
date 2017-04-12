@@ -36,16 +36,37 @@ function Sentiment(dom){
 		'sentiment:select',
 		'sentiment:deselect');
 
+	//Append gradient defs
+	let defs = _svg.selectAll('defs')
+		.data([1])
+		.enter()
+		.append('defs');
+
+	let gradientX = defs.append('linearGradient').attr('id','x-axis')
+		.attr('x1','0%').attr('x2','100%').attr('y1','0%').attr('y2','0%');
+	gradientX.append('stop').attr('offset','0%').attr('style','stop-color:red;stop-opacity:.1')
+	gradientX.append('stop').attr('offset','50%').attr('style','stop-color:purple;stop-opacity:.1')
+	gradientX.append('stop').attr('offset','100%').attr('style','stop-color:blue;stop-opacity:.1')
+	
+	let gradientY = defs.append('linearGradient').attr('id','y-axis')
+		.attr('x1','0%').attr('x2','0%').attr('y1','0%').attr('y2','100%');
+	gradientY.append('stop').attr('offset','0%').attr('style','stop-color:rgb(253,253,253);stop-opacity:0')
+	gradientY.append('stop').attr('offset','80%').attr('style','stop-color:rgb(253,253,253);stop-opacity:1')
+
 	//Append static elements
 	let background = _graphic.selectAll('.background')
 		.data([1])
 		.enter()
 		.append('g').attr('class','background');
-/*		background.append('rect')
-		.style('fill','white')
+	background.append('rect').attr('class','background-x-axis')
 		.attr('width',_w)
-		.attr('height',_h);
-*/	let ticks = background.selectAll('.tick')
+		.attr('height',_h)
+		.attr('fill','url(#x-axis)');
+	background.append('rect').attr('class','background-y-axis')
+		.attr('width',_w)
+		.attr('height',_h)
+		.attr('fill','url(#y-axis)');
+	let ticks = background.selectAll('.tick')
 		.data(d3.range(-1,1.001,.2))
 		.enter()
 		.append('line').attr('class','tick')
@@ -55,17 +76,18 @@ function Sentiment(dom){
 		.attr('y2',_h)
 		.style('stroke-width','1px')
 		.style('stroke',d=>_scaleColor(d));
-	ticks.filter(d=>(d!==0))
+	ticks
 		.style('stroke-dasharray','3px 3px')
-		.filter(d=>(d===-1 || d===1))
+		.filter(d=>(d===-1 || d===1 || d===0))
 		.attr('y1',20);
 	background.selectAll('.sentiment-anchor-text')
-		.data([['More negative',-1], ['More positive',1]])
+		.data([['More negative',-1,0], ['More positive',1,0],['More strongly felt',0,0],['More indifferent',0,1]])
 		.enter()
 		.append('text')
 		.attr('class','sentiment-anchor-text anno')
 		.attr('text-anchor','middle')
 		.attr('x',(d)=>_scaleX(d[1]))
+		.attr('y',d=>_h*d[2])
 		.style('fill',d=>_scaleColor(d[1]))
 		.attr('dy',10)
 		.text(d=>d[0]);
@@ -82,7 +104,6 @@ function Sentiment(dom){
 		.append('g')
 		.attr('class','brush')
 		.call(brush);
-
 
 	function exports(docs){
 
@@ -143,20 +164,22 @@ function Sentiment(dom){
 
 		//Brush event handling
 		_dis.on('brushstart',()=>{
-			//On brush start, clear all highlights
-/*			let merge = node.merge(nodeEnter);
-			merge.select('.inner').attr('r',2);
-			merge.select('.outer').attr('r',_r);
-*/		});
+			//no op
+		});
 		_dis.on('brush',extent=>{
 			//On brush, highlight doc nodes
 			let merge = node.merge(nodeEnter);
 			merge.select('.inner').attr('r',2);
 			merge.select('.outer').attr('r',_r);
+
 			let selected = merge
 				.filter(_filterFromExtent(extent));
 			selected.select('.inner').attr('r',3);
 			selected.select('.outer').attr('r',_r*1.5);
+
+			//Also update brush selection region appearance
+			//FIXME: not working too hot
+			//_brush.select('.selection').attr('fill','blue');
 		});
 		_dis.on('brushend',extent=>{
 			//On brush end, either dispatch 'sentiment:select' or 'sentiment:deselect'
@@ -168,12 +191,11 @@ function Sentiment(dom){
 				_dis.call('sentiment:deselect');
 			}else{
 				let merge = node.merge(nodeEnter);
+
 				let selected = merge
 					.filter(_filterFromExtent(extent));
 				//extract data array from selected
-				let selectedDocs = selected.nodes().map((n)=>{
-					return d3.select(n).datum();
-				});
+				let selectedDocs = selected.nodes().map(n=>d3.select(n).datum());
 				_dis.call('sentiment:select', null, selectedDocs);
 			}
 		});

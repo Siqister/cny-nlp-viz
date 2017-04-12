@@ -22,15 +22,22 @@ function TextNode(){
 		//Build DOM
 		//FIXME: not conformant with enter exit update
 		let target = d3.select(this)
+			.selectAll('.target')
+			.data([1])
+			.enter()
 			.append('rect')
 			.attr('width',d.w)
 			.attr('height',d.h)
-			.attr('class','target');
+			.attr('class','target'); //only drawn once
 
 		let histogramBackground = d3.select(this)
+			.selectAll('.histogram-back')
+			.data([1])
+			.enter()
 			.append('g')
 			.attr('transform',`translate(${_m.l},${_m.t})`)
-			.attr('class','histogram-back')
+			.attr('class','histogram-back');
+		histogramBackground //only drawn once
 			.selectAll('.bin')
 			.data(d3.range(0,1,.1))
 			.enter()
@@ -41,11 +48,15 @@ function TextNode(){
 			.attr('height',_h)
 			.style('fill','white');
 
-
 		let histogram = d3.select(this)
+			.selectAll('.histogram')
+			.data([1]);
+		let histogramEnter = histogram
+			.enter()
 			.append('g')
 			.attr('transform',`translate(${_m.l},${_m.t})`)
-			.attr('class','histogram')
+			.attr('class','histogram');
+		histogram.merge(histogramEnter)
 			.call(_drawHistogram,d,i);
 
 		let text = d3.select(this)
@@ -87,7 +98,7 @@ function TextNode(){
 	function _drawHistogram(n,datum,index){
 		let bins = n
 			.selectAll('.bin')
-			.data(_histogram(datum.value.instances));
+			.data(_histogram(datum.value.instances),(d,i)=>i);
 		let binsEnter = bins.enter()
 			.append('rect').attr('class','bin')
 			.attr('x',(d,i)=>i*_w/10)

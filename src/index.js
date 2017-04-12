@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import {loadJson, mapEntitiesToArray, partialCall} from './modules/utils';
+import {loadJson, mapDocsToEntitiesArray, partialCall} from './modules/utils';
 import EntitiesGraph from './modules/Entities';
 import Comments from './modules/Comments';
 import SentimentGraph from './modules/Sentiment';
@@ -17,12 +17,14 @@ const dispatch = d3.dispatch(
 	'comment:hover',
 	'comment:unhover',
 	'sentiment:hover',
-	'sentiment:unhover'
+	'sentiment:unhover',
+	'sentiment:select',
+	'sentiment:deselect'
 );
 
 //Build modules on data load
 data
-	.then(mapEntitiesToArray)
+	.then(mapDocsToEntitiesArray)
 	.then(entitiesGraph);
 data
 	.then(comments);
@@ -37,13 +39,19 @@ comments
 sentimentGraph
 	.on('sentiment:hover', partialCall(dispatch,'sentiment:hover',null))
 	.on('sentiment:unhover', partialCall(dispatch,'sentiment:unhover',null))
-	.on('sentiment:select',(docs)=>{ console.log(docs)})
-	.on('sentiment:deselect',()=>{console.log('Sentiment:deselect')});
+	.on('sentiment:select',partialCall(dispatch,'sentiment:select',null))
+	.on('sentiment:deselect',partialCall(dispatch,'sentiment:deselect',null));
 
 //...Receiving
 dispatch.on('comment:hover', sentimentGraph.highlight);
 dispatch.on('comment:unhover', sentimentGraph.unhighlight);
 dispatch.on('sentiment:hover', comments.highlight);
 dispatch.on('sentiment:unhover',comments.unhighlight);
+dispatch.on('sentiment:select',(docs)=>{
+	console.log(docs);
+});
+dispatch.on('sentiment:deselect',()=>{
+
+});
 
 

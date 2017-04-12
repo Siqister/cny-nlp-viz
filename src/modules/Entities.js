@@ -46,6 +46,7 @@ function Entities(dom){
 			.data(nodes,d=>d.name);
 		let nsEnter = ns.enter()
 			.append('g').attr('class','node');
+		let nsExit = ns.exit().remove();
 		nsEnter.merge(ns)
 			.call(_position)
 			.each(TextNode());
@@ -53,6 +54,7 @@ function Entities(dom){
 
 	function _position(ns){
 		ns
+			.transition().duration(1000)
 			.attr('transform',(d,i)=>{
 				let currentX = i%_nx,
 					currentY = Math.floor(i/_nx);

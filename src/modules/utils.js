@@ -33,7 +33,7 @@ function loadJson(url){
 	});
 }
 
-function mapEntitiesToArray(docs){
+function mapDocsToEntitiesArray(docs){
 	return docs.filter(doc=>doc)
 		.map((doc)=>{
 			return doc.entities.map((entity)=>{
@@ -53,4 +53,4 @@ function partialCall(dis,...presetArgs){
 	}
 }
 
-export {config, scaleColor, loadJson, mapEntitiesToArray, partialCall};
+export {config, scaleColor, loadJson, mapDocsToEntitiesArray, partialCall};
