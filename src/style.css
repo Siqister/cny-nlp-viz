@@ -81,6 +81,7 @@ body{ background:rgb(253,253,253); }
 
 /*#entities-graph*/
 #entities-graph{}
+	#entities-graph .node{ cursor:pointer; }
 	#entities-graph .node text{
 		font-family:'PublicoRoman', sans-serif;
 	}
