@@ -8,7 +8,7 @@ function TextNode(){
 		.thresholds(d3.range(0,1,.1))
 		.domain([0,1])
 		.value(d=>d.salience);
-	const scaleY = d3.scaleLinear().domain([0,10]);
+	const scaleY = d3.scaleLinear().domain([0,20]);
 	let _w, _h;
 
 	function exports(d,i){

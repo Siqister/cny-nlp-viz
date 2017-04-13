@@ -61,7 +61,7 @@ function Entities(dom){
 			.on('click',function(d){
 				if(d3.select(this).classed('selected')){
 					d3.select(this).classed('selected',false);
-					_dis.call('entities:deselect');
+					_dis.call('entities:deselect',null,d);
 				}else{
 					d3.select(this).classed('selected',true);
 					_dis.call('entities:selectEntity',null,d);

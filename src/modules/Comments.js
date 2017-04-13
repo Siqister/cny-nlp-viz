@@ -64,8 +64,9 @@ function Comments(dom){
 				.style('color','white');
 		});
 
-		_dis.on('unhighlight:entity',()=>{
+		_dis.on('unhighlight:entity',(d)=>{
 			merge.selectAll('.entity')
+				.filter(en=>en.name===d.key)
 				.style('background',null)
 				.style('color',null);
 		});
@@ -91,8 +92,8 @@ function Comments(dom){
 		return this;
 	}
 
-	exports.unhighlightEntity = function(){
-		_dis.call('unhighlight:entity');
+	exports.unhighlightEntity = function(d){
+		_dis.call('unhighlight:entity',null,d);
 		return this;
 	}
 

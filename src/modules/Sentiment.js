@@ -12,7 +12,7 @@ function Sentiment(dom){
 		_r = 6;
 
 	const _scaleX = d3.scaleLinear().domain([-1,1]).range([0,_w]), //score
-		_scaleY = d3.scaleLinear().domain([0,5]).range([_h,0]), //magnitude
+		_scaleY = d3.scaleLinear().domain([0,12]).range([_h,0]), //magnitude
 		_scaleOpacity = d3.scaleLinear().domain([0,5]).range([.1,1]),
 		_scaleColor = d3.scaleLinear().domain([-1,0,1]).range(['red','purple','blue']);
 
